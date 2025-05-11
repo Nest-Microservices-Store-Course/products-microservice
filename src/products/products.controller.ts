@@ -4,6 +4,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ValidateProductsDto } from './dto/validate-products.dto';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
@@ -31,5 +32,10 @@ export class ProductsController {
   @MessagePattern('deleteProduct')
   remove(@Payload('uuid', ParseUUIDPipe) uuid: string) {
     return this.productsService.remove(uuid);
+  }
+
+  @MessagePattern('validateProducts')
+  validateProducts(@Payload() validateProductsDto: ValidateProductsDto) {
+    return this.productsService.validateProducts(validateProductsDto);
   }
 }

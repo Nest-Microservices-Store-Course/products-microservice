@@ -3,6 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
+import { ValidateProductsDto } from './dto/validate-products.dto';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -71,5 +72,22 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       where: { uuid: uuid },
       data: { available: false },
     });
+  }
+
+  async validateProducts(validateProductsDto: ValidateProductsDto) {
+    console.log(validateProductsDto);
+    const uuids = Array.from(new Set(validateProductsDto.uuids));
+    const products = await this.product.findMany({
+      where: { uuid: { in: uuids } },
+    });
+
+    if (products.length !== uuids.length) {
+      throw new RpcException({
+        message: 'Some products were not found',
+        status: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    return products;
   }
 }
