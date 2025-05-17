@@ -6,13 +6,12 @@ import { Logger } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.NATS,
       options: {
-        port: env.port,
+        servers: env.natsServers,
       },
     },
   );
@@ -22,9 +21,6 @@ async function bootstrap() {
   }));
   const logger = new Logger('NestApplication');
 
-  // await app.listen(env.port).then(() => {
-  //   logger.log(`Server is running on port ${env.port}`);
-  // });
   await app.listen().then(() => {
     logger.log(`Server is running on port ${env.port}`);
   });
